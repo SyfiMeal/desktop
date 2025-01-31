@@ -4,6 +4,8 @@
   --hunk-handle-width-with-check-all: 16px;
   --hunk-handle-width: 4px;
 
+  display: flex;
+  flex-direction: column;
   width: 100%;
   overflow: hidden;
   flex-grow: 1;
@@ -13,6 +15,10 @@
   * {
     cursor: text;
     user-select: text;
+  }
+
+  .sr-only {
+    user-select: none;
   }
 
   // See https://github.com/desktop/desktop/pull/15128#issuecomment-1232689068
@@ -33,18 +39,19 @@
       }
 
       &.context .before {
-        margin-right: calc(var(--hunk-handle-width) / 2);
+        border-right: calc(var(--hunk-handle-width) / 2) solid var(--diff-border-color);
       }
+
       &.context .after {
-        margin-right: calc(var(--hunk-handle-width) / 2);
+        border-right: calc(var(--hunk-handle-width) / 2) solid var(--diff-border-color);
       }
 
       &.has-check-all-control.context .before {
-        margin-right: calc(var(--hunk-handle-width-with-check-all) / 2);
+        border-right: calc(var(--hunk-handle-width-with-check-all) / 2) solid var(--diff-border-color);
       }
 
       &.has-check-all-control.context .after {
-        margin-left: calc(var(--hunk-handle-width-with-check-all) / 2);
+        border-left: calc(var(--hunk-handle-width-with-check-all) / 2) solid var(--diff-border-color);
       }
 
       &.has-check-all-control {
@@ -58,14 +65,6 @@
         padding-left: calc(var(--hunk-handle-width) / 2);
         padding-right: calc(var(--hunk-handle-width) / 2);
       }
-
-      &.context {
-        margin-left: var(--hunk-handle-width);
-      }
-
-      &.has-check-all-control.context {
-        margin-left: var(--hunk-handle-width-with-check-all);
-      }
     }
   }
 
@@ -73,7 +72,6 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    height: 100%;
     width: 100%;
     font-family: var(--font-family-monospace);
     font-size: var(--font-size-sm);
@@ -95,6 +93,12 @@
     line-height: 20px;
     position: relative;
     height: 100%;
+
+    // Allow right-clicks to go through the octicons to their parent
+    .line-number .octicon,
+    .hunk-handle .octicon {
+      pointer-events: none;
+    }
 
     &.hunk-info {
       background: var(--diff-hunk-background-color);
@@ -188,9 +192,13 @@
       }
     }
 
+    input:focus-visible + label.hunk-handle.selected {
+      background: var(--diff-hover-background-color);
+    }
+
     input:focus-visible + label.hunk-handle {
       .focus-handle {
-        outline: 2px solid #0659d6;
+        outline: 2px solid var(--diff-linenumber-focus-color);
         outline-offset: 3px;
       }
     }
@@ -200,6 +208,10 @@
       width: var(--hunk-handle-width);
       height: 100%;
       background-color: var(--diff-empty-hunk-handle);
+
+      &.selected {
+        background-color: var(--diff-selected-border-color);
+      }
     }
 
     .hunk-handle {
@@ -209,6 +221,11 @@
       color: white;
       padding-top: 3px;
       text-align: center;
+      user-select: none;
+
+      * {
+        user-select: none;
+      }
 
       .focus-handle {
         border-radius: var(--border-radius);
@@ -222,8 +239,8 @@
         height: 12px;
       }
 
-      &.selected {
-        background-color: var(--diff-selected-border-color);
+      * {
+        cursor: pointer;
       }
     }
 
@@ -239,7 +256,6 @@
 
       input:focus-visible + label.hunk-handle {
         .focus-handle {
-          outline: 2px solid white;
           outline-offset: -3px;
         }
       }
@@ -319,6 +335,10 @@
       box-sizing: content-box;
       position: relative;
 
+      input {
+        user-select: none;
+      }
+
       label {
         width: 100%;
         display: flex;
@@ -351,7 +371,7 @@
 
       &.selectable {
         input:focus-visible + label {
-          outline: 2px solid #0659d6;
+          outline: 2px solid var(--diff-linenumber-focus-color);
           outline-offset: -3px;
         }
 
@@ -467,6 +487,23 @@
 
         span:last-child {
           border: none;
+        }
+      }
+    }
+
+    &.editable {
+      .row {
+        &.context .before,
+        &.context .after {
+          border-right: none;
+        }
+
+        &.context {
+          border-left: var(--hunk-handle-width) solid var(--diff-border-color);
+        }
+
+        &.has-check-all-control.context {
+          border-left: var(--hunk-handle-width-with-check-all) solid var(--diff-border-color);
         }
       }
     }
